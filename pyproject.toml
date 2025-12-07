@@ -1,0 +1,18 @@
+[project]
+name = "atomsql"
+version = "0.0.1"
+description = "A small ORM for Python"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.5.0",
+    "pytest>=9.0.1",
+    "ruff>=0.4.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"

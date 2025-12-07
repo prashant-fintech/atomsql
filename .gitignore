@@ -148,3 +148,8 @@ cython_debug/
 
 # PyCharm
 .idea/
+
+# Mermaid diagrams
+*.mermaid
+structure.mermaid
+bump_version.py

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="atomsql",
-    version="0.0.2",
+    version="0.0.1",
     description="A small ORM for Python",
     author="Prashant Singh",
     author_email="box_prashant@outlook.com",

@@ -19,6 +19,9 @@ class Field:
             raise ValueError(f"Field '{self.name}' is required and cannot be None.")
         instance.__dict__[self.name] = value
 
+    def get_sql_type(self):
+        return "TEXT"
+
 
 class IntegerField(Field):
     def __set__(self, instance, value):
@@ -26,12 +29,18 @@ class IntegerField(Field):
             raise TypeError(f"Field '{self.name}' expected an int, got {type(value)}.")
         super().__set__(instance, value)
 
+    def get_sql_type(self):
+        return "INTEGER"
+
 
 class StringField(Field):
     def __set__(self, instance, value):
         if value is not None and not isinstance(value, str):
             raise TypeError(f"Field '{self.name}' expected a str, got {type(value)}.")
         super().__set__(instance, value)
+
+    def get_sql_type(self):
+        return "TEXT"
 
 
 class ModelMeta(type):
@@ -91,9 +100,7 @@ class Database:
         fields_definitions = []
 
         for name, field in model_cls._fields.items():
-            field_type = "TEXT"
-            if isinstance(field, IntegerField):
-                field_type = "INTEGER"
+            field_type = field.get_sql_type()
             constraints = []
             if field.required:
                 constraints.append("NOT NULL")

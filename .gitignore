@@ -307,3 +307,5 @@ import_issues.py
 structure.mermaid
 bump_version.py
 ```
+*.db
+main.py

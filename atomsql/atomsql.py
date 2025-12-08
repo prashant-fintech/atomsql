@@ -75,8 +75,8 @@ class Model(metaclass=ModelMeta):
         """
         Generates and executes the INSERT statement.
         """
-        table_name = self._table_name
-        columns = self._fields.keys()
+        table_name = f'"{self._table_name}"'
+        columns = list(self._fields.keys())
 
         values = [getattr(self, col_name) for col_name in columns]
         placeholders = ["?"] * len(columns)
@@ -96,7 +96,7 @@ class Database:
         """
         Generates and executes the CREATE TABLE statement.
         """
-        table_name = model_cls._table_name
+        table_name = f'"{model_cls._table_name}"'
         fields_definitions = []
 
         for name, field in model_cls._fields.items():
@@ -105,7 +105,7 @@ class Database:
             if field.required:
                 constraints.append("NOT NULL")
 
-            fields_definitions.append(f"{name} {field_type} {' '.join(constraints)}")
+            fields_definitions.append(f'"{name}" {field_type} {" ".join(constraints)}')
         sql = (
             f"CREATE TABLE IF NOT EXISTS {table_name} ({', '.join(fields_definitions)})"
         )

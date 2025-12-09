@@ -3,6 +3,7 @@ import logging
 from .backends.base import DatabaseBackend
 from .backends.sqlite import SQLiteBackend
 from .exceptions import ImproperlyConfigured
+from .models import ModelMeta
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +49,11 @@ class Database:
         self.backend.execute(sql)
         self.backend.commit()
         logger.info(f"Registered model {model_cls.__name__} to table {table_name}")
+
+    def create_all(self):
+        for model_cls in ModelMeta.models:
+            self.register(model_cls)
+            print(f"Registered model {model_cls.__name__}")
 
     def execute(self, query: str, params=None):
         return self.backend.execute(query, params)

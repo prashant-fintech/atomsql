@@ -5,6 +5,8 @@ logger = logging.getLogger(__name__)
 
 
 class ModelMeta(type):
+    models = []
+
     def __new__(cls, name, bases, attrs):
         fields = {}
         for key, value in list(attrs.items()):
@@ -12,7 +14,12 @@ class ModelMeta(type):
                 fields[key] = value
         attrs["_fields"] = fields
         attrs["_table_name"] = name.lower()
-        return super().__new__(cls, name, bases, attrs)
+        new_class = super().__new__(cls, name, bases, attrs)
+
+        if bases:
+            cls.models.append(new_class)
+
+        return new_class
 
 
 class Model(metaclass=ModelMeta):

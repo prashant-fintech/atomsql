@@ -38,10 +38,15 @@ class Database:
             field_type = field.get_sql_type()
 
             constraints = []
-            if field.required:
+            if not field.nullable:
                 constraints.append("NOT NULL")
+            if field.unique:
+                constraints.append("UNIQUE")
 
-            fields_definitions.append(f'"{name}" {field_type} {' '.join(constraints)}')
+            definition = f'"{name}" {field_type}'
+            if constraints:
+                definition += f" {' '.join(constraints)}"
+            fields_definitions.append(definition)
 
         sql = (
             f"CREATE TABLE IF NOT EXISTS {table_name} ({', '.join(fields_definitions)})"

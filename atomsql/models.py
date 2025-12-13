@@ -24,17 +24,19 @@ class ModelMeta(type):
 
 class Model(metaclass=ModelMeta):
     def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            if key in self._fields:
-                setattr(self, key, value)
+        for name, field in self._fields.items():
+            if name in kwargs:
+                value = kwargs[name]
+            else:
+                value = field.default
+                if callable(value):
+                    value = value()
+            setattr(self, name, value)
 
     def save(self, db_interface):
-        table_name = f"'{self._table_name}'"
+        table_name = f'"{self._table_name}"'
         raw_columns = list(self._fields.keys())
-
         values = [getattr(self, column) for column in raw_columns]
-        # Note: This assumes SQLite '?' syntax
-        # Future TODO: Ask db_interface for placeholder style
         placeholders = ["?" for _ in values]
 
         sql = f"INSERT INTO {table_name} ({', '.join(raw_columns)}) VALUES ({', '.join(placeholders)})"

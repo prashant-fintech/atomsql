@@ -27,3 +27,7 @@ class SQLiteBackend(DatabaseBackend):
 
     def close(self) -> None:
         self.connection.close()
+
+    @property
+    def placeholder_char(self) -> str:
+        return "?"

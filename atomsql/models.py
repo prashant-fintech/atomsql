@@ -37,7 +37,7 @@ class Model(metaclass=ModelMeta):
         table_name = f'"{self._table_name}"'
         raw_columns = list(self._fields.keys())
         values = [getattr(self, column) for column in raw_columns]
-        placeholders = ["?" for _ in values]
+        placeholders = [db_interface.backend.placeholder_char for _ in values]
 
         sql = f"INSERT INTO {table_name} ({', '.join(raw_columns)}) VALUES ({', '.join(placeholders)})"
 

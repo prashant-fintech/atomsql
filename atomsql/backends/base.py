@@ -22,3 +22,8 @@ class DatabaseBackend(ABC):
     @abstractmethod
     def close(self) -> None:
         raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def placeholder_char(self) -> str:
+        raise NotImplementedError

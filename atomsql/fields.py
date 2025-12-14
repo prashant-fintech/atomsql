@@ -1,4 +1,18 @@
-from typing import Any
+from typing import Any, Tuple, List
+
+
+class BinaryExpression:
+    def __init__(self, field: "Field", operator: str, value: Any):
+        self.field = field
+        self.operator = operator
+        self.value = value
+
+    def to_sql(self) -> Tuple[str, List[Any]]:
+        sql = f'"{self.field.name}" {self.operator} ?'
+        return sql, [self.value]
+
+    def __repr__(self):
+        return f"<BinaryExpression: {self.field.name} {self.operator} {self.value}>"
 
 
 class Field:
@@ -37,6 +51,24 @@ class Field:
 
     def get_sql_type(self) -> str:
         return "TEXT"
+
+    def __eq__(self, value: Any) -> BinaryExpression:
+        return BinaryExpression(self, "=", value)
+
+    def __ne__(self, value: Any) -> BinaryExpression:
+        return BinaryExpression(self, "!=", value)
+
+    def __lt__(self, value: Any) -> BinaryExpression:
+        return BinaryExpression(self, "<", value)
+
+    def __le__(self, value: Any) -> BinaryExpression:
+        return BinaryExpression(self, "<=", value)
+
+    def __gt__(self, value: Any) -> BinaryExpression:
+        return BinaryExpression(self, ">", value)
+
+    def __ge__(self, value: Any) -> BinaryExpression:
+        return BinaryExpression(self, ">=", value)
 
 
 class IntegerField(Field):

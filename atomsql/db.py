@@ -2,6 +2,7 @@ from urllib.parse import urlparse
 import logging
 from .backends.base import DatabaseBackend
 from .backends.sqlite import SQLiteBackend
+from .backends.postgres import PostgresBackend
 from .exceptions import ImproperlyConfigured
 from .models import ModelMeta
 
@@ -25,7 +26,7 @@ class Database:
                     path = path[1:]
                 return SQLiteBackend(path)
             case "postgres" | "postgresql":
-                raise NotImplementedError("Postgres support is planned for Phase 2")
+                return PostgresBackend(self.uri)
 
             case _:
                 raise ImproperlyConfigured(f"Unsupported database scheme:{scheme}")

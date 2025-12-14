@@ -4,7 +4,9 @@ version = "0.0.1"
 description = "A small ORM for Python"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "psycopg[binary]>=3.3.2",
+]
 
 [dependency-groups]
 dev = [

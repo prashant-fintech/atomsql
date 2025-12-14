@@ -16,3 +16,7 @@ dev = [
 [tool.ruff]
 line-length = 88
 target-version = "py312"
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"

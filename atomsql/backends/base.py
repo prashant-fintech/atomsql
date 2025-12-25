@@ -3,6 +3,11 @@ from typing import Any, List, Optional
 
 
 class DatabaseBackend(ABC):
+    @property
+    @abstractmethod
+    def placeholder_char(self) -> str:
+        raise NotImplementedError
+
     @abstractmethod
     def connect(self, **kwargs: Any) -> None:
         raise NotImplementedError
@@ -21,9 +26,4 @@ class DatabaseBackend(ABC):
 
     @abstractmethod
     def close(self) -> None:
-        raise NotImplementedError
-
-    @property
-    @abstractmethod
-    def placeholder_char(self) -> str:
         raise NotImplementedError

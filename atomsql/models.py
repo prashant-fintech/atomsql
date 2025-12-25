@@ -1,4 +1,5 @@
 from .fields import Field
+from .query import Query
 import logging
 
 logger = logging.getLogger(__name__)
@@ -43,3 +44,7 @@ class Model(metaclass=ModelMeta):
 
         db_interface.execute(sql, values)
         logger.info(f"Saved {self._table_name} with values: {values}")
+
+    @classmethod
+    def objects(cls, db):
+        return Query(cls, db)

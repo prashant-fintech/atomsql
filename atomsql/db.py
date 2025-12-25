@@ -69,3 +69,8 @@ class Database:
 
     def close(self):
         self.backend.close()
+
+    def query(self, model_cls):
+        from .query import Query
+
+        return Query(model_cls, self)

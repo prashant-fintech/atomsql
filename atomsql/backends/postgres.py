@@ -1,15 +1,19 @@
-import psycopg
-from typing import Any, List, Optional
+from typing import Any, List, Optional, TYPE_CHECKING
 from .base import DatabaseBackend
+
+if TYPE_CHECKING:
+    import psycopg
 
 
 class PostgresBackend(DatabaseBackend):
     def __init__(self, db_path: str) -> None:
         self.db_path = db_path
-        self.connection: Optional[psycopg.Connection] = None
-        self.cursor: Optional[psycopg.Cursor] = None
+        self.connection: Optional["psycopg.Connection"] = None
+        self.cursor: Optional["psycopg.Cursor"] = None
 
     def connect(self, **kwargs: Any) -> None:
+        import psycopg
+
         self.connection = psycopg.connect(self.db_path, **kwargs)
         self.cursor = self.connection.cursor()
 

@@ -9,6 +9,10 @@ class SQLiteBackend(DatabaseBackend):
         self.connection = None
         self.cursor = None
 
+    @property
+    def placeholder_char(self) -> str:
+        return "?"
+
     def connect(self, **kwargs: Any) -> None:
         target = self.db_path if self.db_path else ":memory:"
         self.connection = sqlite3.connect(target, **kwargs)
@@ -27,7 +31,3 @@ class SQLiteBackend(DatabaseBackend):
 
     def close(self) -> None:
         self.connection.close()
-
-    @property
-    def placeholder_char(self) -> str:
-        return "?"

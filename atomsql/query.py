@@ -1,8 +1,14 @@
-from typing import Type, List, Any, Optional
+from typing import Type, Any, TypeVar, TYPE_CHECKING, Iterable, Optional
+
+if TYPE_CHECKING:
+    from .models import Model
+    from .db import Database
+
+T = TypeVar("T", bound="Model")
 
 
-class Query:
-    def __init__(self, model_cls: Type, db):
+class QuerySet(Iterable[T]):
+    def __init__(self, model_cls: Type[T], db: "Database"):
         self.model_cls = model_cls
         self.db = db
         self._filters = {}
@@ -10,19 +16,19 @@ class Query:
         self._limit: Optional[int] = None
         self._offset: Optional[int] = None
 
-    def filter(self, **kwargs: Any) -> "Query":
+    def filter(self, **kwargs: Any) -> "QuerySet[T]":
         self._filters.update(kwargs)
         return self
 
-    def order_by(self, field_name: str) -> "Query":
+    def order_by(self, field_name: str) -> "QuerySet[T]":
         self._order_by = field_name
         return self
 
-    def limit(self, limit: int) -> "Query":
+    def limit(self, limit: int) -> "QuerySet[T]":
         self._limit = limit
         return self
 
-    def offset(self, offset: int) -> "Query":
+    def offset(self, offset: int) -> "QuerySet[T]":
         self._offset = offset
         return self
 
@@ -54,17 +60,12 @@ class Query:
 
         return sql, params
 
-    def all(self) -> List[Any]:
+    def __iter__(self):
         sql, params = self._build_sql()
         cursor = self.db.backend.execute(sql, params)
-        rows = cursor.fetchall()
-        results = []
-        field_names = list(self.model_cls._fields.keys())
-        for row in rows:
-            data = dict(zip(field_names, row))
-            results.append(self.model_cls(**data))
-        return results
-
-    def first(self) -> Optional[Any]:
-        res = self.limit(1).all()
-        return res[0] if res else None
+        while True:
+            row = cursor.fetchone()
+            if row is None:
+                break
+            data = dict(zip(self.model_cls._fields.keys(), row))
+            yield self.model_cls(**data)

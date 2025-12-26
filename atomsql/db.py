@@ -56,6 +56,8 @@ class Database:
         self.backend.commit()
         logger.info(f"Registered model {model_cls.__name__} to table {table_name}")
 
+        model_cls._db = self
+
     def create_all(self):
         for model_cls in ModelMeta.models:
             self.register(model_cls)

@@ -1,5 +1,5 @@
 from .fields import Field
-from .query import Query
+from .query import QuerySet
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,6 +16,7 @@ class ModelMeta(type):
         attrs["_fields"] = fields
         attrs["_table_name"] = name.lower()
         new_class = super().__new__(cls, name, bases, attrs)
+        new_class._db = None
 
         if bases:
             cls.models.append(new_class)
@@ -46,5 +47,13 @@ class Model(metaclass=ModelMeta):
         logger.info(f"Saved {self._table_name} with values: {values}")
 
     @classmethod
-    def objects(cls, db):
-        return Query(cls, db)
+    def all(cls) -> QuerySet:
+        if cls._db is None:
+            raise RuntimeError(
+                f"Model {cls.__name__} is not registered to any database."
+            )
+        return QuerySet(cls, cls._db)
+
+    @classmethod
+    def filter(cls, **kwargs) -> QuerySet:
+        return cls.all().filter(**kwargs)

@@ -1,10 +1,23 @@
 from typing import Type, Any, TypeVar, TYPE_CHECKING, Iterable, Optional
+import functools
 
 if TYPE_CHECKING:
     from .models import Model
     from .db import Database
 
 T = TypeVar("T", bound="Model")
+
+
+def aggregate_method(func):
+    @functools.wraps(func)
+    def wrapper(self: "QuerySet[T]", *args, **kwargs) -> Any:
+        agg_expression = func(self, *args, **kwargs)
+        sql, params = self._build_sql(select_expression=agg_expression)
+        cursor = self.db.backend.execute(sql, params)
+        result = cursor.fetchone()
+        return result[0] if result else None
+
+    return wrapper
 
 
 class QuerySet(Iterable[T]):
@@ -32,11 +45,36 @@ class QuerySet(Iterable[T]):
         self._offset = offset
         return self
 
-    def _build_sql(self):
-        table_name = f'"{self.model_cls._table_name}"'
-        columns = [f'"{col}"' for col in self.model_cls._fields.keys()]
+    @aggregate_method
+    def count(self) -> str:
+        return "COUNT(*)"
 
-        sql = f"SELECT {', '.join(columns)} FROM {table_name}"
+    @aggregate_method
+    def sum(self, field_name: str) -> str:
+        if field_name not in self.model_cls._fields:
+            raise ValueError(
+                f"Field '{field_name}' does not exist on model '{self.model_cls.__name__}'"
+            )
+        return f'SUM("{field_name}")'
+
+    @aggregate_method
+    def avg(self, field_name: str) -> str:
+        if field_name not in self.model_cls._fields:
+            raise ValueError(
+                f"Field '{field_name}' does not exist on model '{self.model_cls.__name__}'"
+            )
+        return f'AVG("{field_name}")'
+
+    def _build_sql(self, select_expression: Optional[str] = None):
+        table_name = f'"{self.model_cls._table_name}"'
+
+        if select_expression is None:
+            select_expression = ", ".join(
+                [f'"{col}"' for col in self.model_cls._fields.keys()]
+            )
+
+        sql = f"SELECT {select_expression} FROM {table_name} "
+
         params = []
 
         if self._filters:

@@ -47,7 +47,7 @@ class Model(metaclass=ModelMeta):
         logger.info(f"Saved {self._table_name} with values: {values}")
 
     @classmethod
-    def all(cls) -> QuerySet:
+    def objects(cls) -> QuerySet:
         if cls._db is None:
             raise RuntimeError(
                 f"Model {cls.__name__} is not registered to any database."
